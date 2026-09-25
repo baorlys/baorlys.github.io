@@ -347,8 +347,8 @@ function StackGrid() {
 function Approach() {
   const cell = 'rounded-2xl border border-line p-7 md:p-8'
   return (
-    <section id="approach" data-focus="rest" className="bg-ink-2">
-      <div className="mx-auto max-w-7xl px-5 py-24 md:px-8 md:py-32">
+    <section id="approach" data-focus="rest" className="flex min-h-[100dvh] items-center bg-ink-2">
+      <div className="mx-auto w-full max-w-7xl px-5 py-24 md:px-8">
         <div className="grid gap-4 md:grid-cols-6">
           <Reveal className={`${cell} bg-[radial-gradient(120%_120%_at_0%_0%,rgba(184,243,106,0.12),transparent_55%)] md:col-span-4`}>
             <h2 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tighter md:text-5xl">
@@ -384,8 +384,8 @@ function Approach() {
 
 function Contact() {
   return (
-    <section data-focus="rest" className="bg-ink">
-      <div className="mx-auto max-w-7xl px-5 py-28 md:px-8 md:py-40">
+    <section data-focus="rest" className="flex min-h-[100dvh] flex-col bg-ink">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-28 md:px-8">
         <Reveal>
           <h2 className="text-3xl font-semibold tracking-tighter text-mute md:text-4xl">Building something that has to hold?</h2>
           <a
@@ -405,7 +405,7 @@ function Contact() {
           </PillLink>
         </div>
       </div>
-      <footer className="mx-auto flex max-w-7xl flex-wrap justify-between gap-4 border-t border-line px-5 py-8 text-sm text-mute md:px-8">
+      <footer className="mx-auto flex w-full max-w-7xl flex-wrap justify-between gap-4 border-t border-line px-5 py-8 text-sm text-mute md:px-8">
         <span>© 2026 Bao Ly</span>
         <span className="hidden md:block">
           Press <kbd className="font-mono text-fog">j</kbd> / <kbd className="font-mono text-fog">k</kbd> to move between sections
