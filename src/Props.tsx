@@ -124,8 +124,8 @@ export function createCoinGeometry(): BufferGeometry {
     [radius * 0.76, half * 0.5],
     [0, half * 0.5],
   ].map(([x, y]) => new Vector2(x, y))
-  const body = new LatheGeometry(profile, 64).toNonIndexed()
-  const star = new ExtrudeGeometry(starShape(0.13, 0.055), { depth: 0.01, bevelEnabled: true, bevelThickness: 0.006, bevelSize: 0.006, bevelSegments: 2 })
+  const body = new LatheGeometry(profile, 32).toNonIndexed()
+  const star = new ExtrudeGeometry(starShape(0.13, 0.055), { depth: 0.01, bevelEnabled: true, bevelThickness: 0.006, bevelSize: 0.006, bevelSegments: 1, curveSegments: 1 })
   star.rotateX(-Math.PI / 2)
   star.translate(0, half * 0.5, 0)
   const back = star.clone().rotateX(Math.PI)

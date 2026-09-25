@@ -1,7 +1,7 @@
-import { Edges, Environment, Lightformer, Line, Preload, Sparkles } from '@react-three/drei'
+import { Edges, Environment, Lightformer, Line, PerformanceMonitor, Preload, Sparkles } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
-import { Suspense, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
+import { BloomEffect, EffectComposer, EffectPass, RenderPass, VignetteEffect } from 'postprocessing'
+import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { useTilt } from './Props'
 import { BankCard, Loyalty, Phone } from './Worlds'
 import { Color, Group, InstancedMesh, MathUtils, Mesh, Object3D, QuadraticBezierCurve3, Vector3 } from 'three'
@@ -35,6 +35,8 @@ function arc(from: Vector3, to: Vector3, bow: number) {
   const normal = new Vector3().subVectors(to, from).cross(new Vector3(0, 0, 1)).normalize()
   return new QuadraticBezierCurve3(from, mid.addScaledVector(normal, bow), to)
 }
+
+const MAX_DPR = 1.5
 
 const ORDER: Record<Focus, number> = { hero: 0, bank: 1, superapp: 2, loyalty: 3, experience: 4, rest: 5 }
 const TRANSITION_SECONDS = 1.1
@@ -93,16 +95,16 @@ function Core({ still }: { still: boolean }) {
     <group>
       <mesh ref={shell}>
         <icosahedronGeometry args={[0.5, 0]} />
-        <meshPhysicalMaterial color={FOG} roughness={0.12} transmission={1} thickness={0.4} ior={1.3} transparent opacity={0.9} />
+        <meshPhysicalMaterial color={FOG} roughness={0.08} metalness={0.1} clearcoat={1} transparent opacity={0.28} depthWrite={false} />
         <Edges color={ACID} threshold={1} transparent opacity={0.55} />
       </mesh>
       <mesh ref={heart}>
-        <sphereGeometry args={[0.09, 32, 32]} />
+        <sphereGeometry args={[0.09, 16, 12]} />
         <meshBasicMaterial color={GLOW} toneMapped={false} />
       </mesh>
       <group ref={orbit} rotation={[1.1, 0.3, 0]}>
         <mesh>
-          <torusGeometry args={[0.8, 0.008, 8, 96]} />
+          <torusGeometry args={[0.8, 0.008, 4, 64]} />
           <meshBasicMaterial color={ACID} transparent opacity={0.6} />
         </mesh>
         <mesh position={[0.8, 0, 0]}>
@@ -156,12 +158,12 @@ function ClusterGraph({ cluster, focus, still, labels }: { cluster: Cluster; foc
         <Line key={i} points={points} color={DIM} lineWidth={1.2} transparent opacity={0.8} />
       ))}
       <instancedMesh ref={packets} args={[undefined, undefined, curves.length * 2]}>
-        <sphereGeometry args={[0.04, 12, 12]} />
+        <sphereGeometry args={[0.04, 8, 6]} />
         <meshBasicMaterial color={GLOW} toneMapped={false} />
       </instancedMesh>
       {curves.map((curve, i) => (
         <mesh key={i} position={curve.v2}>
-          <sphereGeometry args={[0.085, 32, 32]} />
+          <sphereGeometry args={[0.085, 16, 12]} />
           <meshStandardMaterial color={FOG} emissive={ACID} emissiveIntensity={0.15} roughness={0.35} />
         </mesh>
       ))}
@@ -192,9 +194,16 @@ function Network({ focus, still, labels }: { focus: Focus; still: boolean; label
 
 export default function Scene({ focus, wide, still }: { focus: Focus; wide: boolean; still: boolean }) {
   const labels = useRef(new Map<string, HTMLSpanElement>())
+  const [dpr, setDpr] = useState(MAX_DPR)
   return (
     <>
-      <Canvas camera={{ position: [0, 0, 9], fov: 45 }} dpr={[1, 1.75]} frameloop={still ? 'demand' : 'always'} gl={{ antialias: true }}>
+      <Canvas
+        camera={{ position: [0, 0, 9], fov: 45 }}
+        dpr={dpr}
+        frameloop={still || focus === 'rest' ? 'demand' : 'always'}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+      >
+        <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(MAX_DPR)} />
         <Invalidate focus={focus} wide={wide} />
         <color attach="background" args={['#0c0d0c']} />
         <fog attach="fog" args={['#0c0d0c', 8, 17]} />
@@ -224,10 +233,7 @@ export default function Scene({ focus, wide, still }: { focus: Focus; wide: bool
         </Stage>
         {!still && <Sparkles count={90} scale={[16, 9, 8]} size={1.4} speed={0.2} opacity={0.3} color="#e8eae5" />}
         <Preload all />
-        <EffectComposer multisampling={4}>
-          <Bloom mipmapBlur luminanceThreshold={1.1} intensity={0.7} radius={0.6} />
-          <Vignette offset={0.25} darkness={0.7} />
-        </EffectComposer>
+        <PostEffects />
       </Canvas>
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {CLUSTERS.map(({ core }) => (
@@ -247,5 +253,26 @@ export default function Scene({ focus, wide, still }: { focus: Focus; wide: bool
 function Invalidate({ focus, wide }: { focus: Focus; wide: boolean }) {
   const invalidate = useThree((state) => state.invalidate)
   useEffect(() => invalidate(), [focus, wide, invalidate])
+  return null
+}
+
+function PostEffects() {
+  const { gl, scene, camera, size, viewport } = useThree()
+  const composer = useMemo(() => {
+    const effects = new EffectComposer(gl, { multisampling: 0 })
+    effects.addPass(new RenderPass(scene, camera))
+    effects.addPass(
+      new EffectPass(
+        camera,
+        new BloomEffect({ mipmapBlur: true, luminanceThreshold: 1.1, intensity: 0.7, radius: 0.6 }),
+        new VignetteEffect({ offset: 0.25, darkness: 0.7 }),
+      ),
+    )
+    return effects
+  }, [gl, scene, camera])
+
+  useEffect(() => () => composer.dispose(), [composer])
+  useEffect(() => composer.setSize(size.width, size.height), [composer, size, viewport.dpr])
+  useFrame((_, delta) => composer.render(delta), 1)
   return null
 }

@@ -1,5 +1,5 @@
 import { ArrowDownRight, ArrowUpRight, GithubLogo, LinkedinLogo } from '@phosphor-icons/react'
-import { motion, useReducedMotion } from 'motion/react'
+import { domAnimation, LazyMotion, m, useReducedMotion } from 'motion/react'
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import type { Focus } from './Scene'
 
@@ -177,7 +177,7 @@ function useVimNavigation(reduce: boolean) {
 function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
   const reduce = useReducedMotion()
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={reduce ? false : { opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -185,7 +185,7 @@ function Reveal({ children, delay = 0, className }: { children: ReactNode; delay
       transition={{ duration: 0.8, delay, ease: EASE }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -236,21 +236,21 @@ function Hero() {
   return (
     <section id="top" data-focus="hero" className="mx-auto flex min-h-[100dvh] max-w-7xl items-end px-5 pb-20 pt-24 md:items-center md:px-8 md:pb-0">
       <div className="max-w-xl">
-        <motion.p {...rise(0.1)} className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-acid">
+        <m.p {...rise(0.1)} className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-acid">
           Bao Ly, Backend Engineer
-        </motion.p>
-        <motion.h1 {...rise(0.2)} className="text-5xl font-semibold leading-[1.02] tracking-tighter md:text-6xl lg:text-7xl">
+        </m.p>
+        <m.h1 {...rise(0.2)} className="text-5xl font-semibold leading-[1.02] tracking-tighter md:text-6xl lg:text-7xl">
           I build the backend that moves money.
-        </motion.h1>
-        <motion.p {...rise(0.35)} className="mt-6 max-w-md text-lg leading-relaxed text-mute">
+        </m.h1>
+        <m.p {...rise(0.35)} className="mt-6 max-w-md text-lg leading-relaxed text-mute">
           Two years building onboarding and identity backends for a 3-million-customer digital bank and a fintech super app.
-        </motion.p>
-        <motion.div {...rise(0.5)} className="mt-10 flex flex-wrap gap-3">
+        </m.p>
+        <m.div {...rise(0.5)} className="mt-10 flex flex-wrap gap-3">
           <PillLink href="#bank" primary>
             See the work <ArrowDownRight size={16} weight="bold" />
           </PillLink>
           <PillLink href={`mailto:${EMAIL}`}>Email me</PillLink>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )
@@ -259,7 +259,7 @@ function Hero() {
 function ProjectSection({ project }: { project: Project }) {
   return (
     <section id={project.id} data-focus={project.id} className="mx-auto flex min-h-[100dvh] max-w-7xl items-start px-5 pb-24 pt-[48dvh] md:items-center md:px-8 md:py-24">
-      <div className="max-w-xl rounded-2xl bg-ink/75 md:max-w-[50%] lg:max-w-xl p-6 backdrop-blur-sm md:bg-transparent md:p-0 md:backdrop-blur-none">
+      <div className="max-w-xl rounded-2xl bg-ink/90 p-6 md:max-w-[50%] md:bg-transparent md:p-0 lg:max-w-xl">
         <Reveal>
           <h2 className="text-4xl font-semibold tracking-tighter md:text-5xl">{project.name}</h2>
           <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-mute">{project.summary}</p>
@@ -293,7 +293,7 @@ function ProjectSection({ project }: { project: Project }) {
 function Experience() {
   return (
     <section id="experience" data-focus="experience" className="mx-auto flex min-h-[100dvh] max-w-7xl items-start px-5 pb-24 pt-[48dvh] md:items-center md:px-8 md:py-24">
-      <div className="max-w-xl rounded-2xl bg-ink/75 p-6 backdrop-blur-sm md:max-w-[50%] md:bg-transparent md:p-0 md:backdrop-blur-none lg:max-w-xl">
+      <div className="max-w-xl rounded-2xl bg-ink/90 p-6 md:max-w-[50%] md:bg-transparent md:p-0 lg:max-w-xl">
         <Reveal>
           <h2 className="text-4xl font-semibold tracking-tighter md:text-5xl">Experience</h2>
         </Reveal>
@@ -422,27 +422,29 @@ export default function App() {
   useVimNavigation(reduce)
 
   return (
-    <div className="grain">
-      <div
-        aria-hidden
-        className={`fixed inset-0 transition-opacity duration-700 ${focus === 'rest' ? 'opacity-0' : wide ? 'opacity-100' : 'opacity-70'}`}
-      >
-        <SceneBoundary>
-          <Suspense fallback={null}>
-            <Scene focus={focus} wide={wide} still={reduce} />
-          </Suspense>
-        </SceneBoundary>
+    <LazyMotion features={domAnimation} strict>
+      <div className="grain">
+        <div
+          aria-hidden
+          className={`fixed inset-0 transition-opacity duration-700 ${focus === 'rest' ? 'opacity-0' : wide ? 'opacity-100' : 'opacity-70'}`}
+        >
+          <SceneBoundary>
+            <Suspense fallback={null}>
+              <Scene focus={focus} wide={wide} still={reduce} />
+            </Suspense>
+          </SceneBoundary>
+        </div>
+        <Nav />
+        <main className="relative">
+          <Hero />
+          {PROJECTS.map((project) => (
+            <ProjectSection key={project.id} project={project} />
+          ))}
+          <Experience />
+          <Approach />
+          <Contact />
+        </main>
       </div>
-      <Nav />
-      <main className="relative">
-        <Hero />
-        {PROJECTS.map((project) => (
-          <ProjectSection key={project.id} project={project} />
-        ))}
-        <Experience />
-        <Approach />
-        <Contact />
-      </main>
-    </div>
+    </LazyMotion>
   )
 }
