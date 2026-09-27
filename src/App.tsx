@@ -17,6 +17,7 @@ type Project = {
   metric: { value: string; label: string }
   highlights: { title: string; body: string }[]
   stack: string[]
+  caseStudy?: { label: string; href: string }
 }
 
 const PROJECTS: Project[] = [
@@ -32,6 +33,7 @@ const PROJECTS: Project[] = [
       { title: 'Pool backpressure', body: 'Capped refill batches so a drained pool cannot stampede the database, plus reclaim for crashed pods.' },
     ],
     stack: ['Java', 'Spring Boot 3', 'PostgreSQL', 'Kafka', 'AWS KMS', 'EKS'],
+    caseStudy: { label: 'How the CIF pools work', href: '/work/cif-allocation/' },
   },
   {
     id: 'superapp',
@@ -297,6 +299,15 @@ function ProjectSection({ project }: { project: Project }) {
               </li>
             ))}
           </ul>
+          {project.caseStudy && (
+            <a
+              href={project.caseStudy.href}
+              className="group mt-8 inline-flex items-center gap-2 text-sm font-medium text-acid transition hover:text-fog"
+            >
+              {project.caseStudy.label}
+              <ArrowUpRight size={16} weight="bold" className="transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          )}
         </Reveal>
       </div>
     </section>

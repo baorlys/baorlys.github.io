@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0c0d0c" />
+    <title>Allocating 11,000 customer IDs a day with no duplicates - Bao Ly</title>
+    <meta name="description" content="How I replaced sequence-based issuance of customer IDs in a digital bank's onboarding flow with pre-allocated pools." />
+    <link rel="canonical" href="https://baorlys.dev/work/cif-allocation/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://baorlys.dev/work/cif-allocation/" />
+    <meta property="og:title" content="Allocating 11,000 customer IDs a day with no duplicates" />
+    <meta property="og:description" content="How I replaced sequence-based issuance of customer IDs in a digital bank's onboarding flow with pre-allocated pools." />
+    <meta property="og:image" content="https://baorlys.dev/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="module" src="/src/case.ts"></script>
+  </head>
+  <body class="grain">
+    <header class="border-b border-line/60">
+      <nav class="mx-auto flex h-16 max-w-3xl items-center justify-between px-5 md:px-8">
+        <a href="/" class="font-mono text-sm font-semibold tracking-tight">bao<span class="text-acid">.</span>ly</a>
+        <a href="/#bank" class="text-sm text-mute transition hover:text-fog">Back to work</a>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+      <article class="case">
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-acid">Case study, digital bank</p>
+        <h1 class="mt-5 text-4xl font-semibold leading-[1.08] tracking-tighter md:text-6xl">Allocating 11,000 customer IDs a day with no duplicates</h1>
+        <p class="mt-6 text-lg leading-relaxed text-mute">How I replaced sequence-based issuance of customer IDs in a digital bank's onboarding flow with pre-allocated pools.</p>
+
+        <h2>The job</h2>
+        <p>Every customer who opens an account at the bank gets a CIF number, the ID that follows them through every product. The bank has about 3 million customers, and the onboarding flow issues around 11,000 of these numbers a day. The previous design took them from a sequence, which kept them unique but made each one easy to guess from the last.</p>
+
+        <h2>What the IDs had to do</h2>
+        <ul>
+          <li>Stay unique. A duplicate CIF would mean two people sharing one banking identity.</li>
+          <li>Not reveal the next or previous ID.</li>
+          <li>Follow a separate format for each customer type, with its own prefix and length.</li>
+          <li>Be handed out by several service pods at the same time without them waiting on each other.</li>
+        </ul>
+
+        <h2>One pool per customer type</h2>
+        <p>Each customer type has its own pool, and each pool carries its own Feistel seed, prefix and ID length.</p>
+
+        <h2>Why a Feistel network</h2>
+        <p>A Feistel network turns a counter into a scrambled number of the same size. Because it is a permutation, two different inputs never produce the same output, so the IDs are unique by construction and there is no table to check. Issuing one takes constant time. Nothing is generated ahead of time, and nothing queries the database to see whether an ID is already taken.</p>
+        <pre><code>// Simplified sketch, not the production code.
+long permute(long counter, long domain, long[] roundKeys) {
+    long x = counter;
+    do {
+        x = feistel(x, roundKeys);
+    } while (x &gt;= domain); // cycle-walk until the result fits the ID length
+    return x;
+}</code></pre>
+
+        <h2>Claiming without waiting</h2>
+        <p>Pods claim IDs with PostgreSQL <code>FOR UPDATE SKIP LOCKED</code>. When one pod has locked a row, the next pod skips it and takes another, so concurrent onboarding requests do not queue behind each other.</p>
+        <pre><code>-- Simplified sketch.
+SELECT id FROM cif_pool
+WHERE customer_type = :type AND status = 'AVAILABLE'
+ORDER BY id
+LIMIT 1
+FOR UPDATE SKIP LOCKED;</code></pre>
+
+        <h2>Keeping the pools full</h2>
+        <p>A cron job refills a pool when it drops below a minimum threshold. Each run is capped by a <code>max-batches-per-run</code> setting, so a drained pool cannot send a burst of inserts at the database. A separate reclaim job returns reservations that were left behind when a pod crashed.</p>
+
+        <h2>Watching it</h2>
+        <p>Micrometer gauges report the depth of every pool, and alerts fire before a pool runs dry.</p>
+
+        <h2>Tuning the hot table</h2>
+        <p>The allocation table is the busiest one in the flow. Restructuring it cut write amplification, and I dropped a dedup index that had become the throughput ceiling.</p>
+
+        <h2>Result</h2>
+        <p>Across the pools, the flow issues around 11,000 CIFs a day with no duplicates.</p>
+
+        <ul class="chips">
+          <li>Java</li>
+          <li>Spring Boot</li>
+          <li>PostgreSQL</li>
+          <li>Micrometer</li>
+          <li>Kubernetes</li>
+        </ul>
+
+        <p class="note">Details are simplified and the client is not named.</p>
+      </article>
+
+      <nav class="mt-16 flex flex-wrap gap-3 border-t border-line pt-10">
+        <a href="/#bank" class="inline-flex items-center gap-2 rounded-full bg-acid px-5 py-3 text-sm font-medium text-ink transition hover:bg-fog">Back to work</a>
+        <a href="mailto:lygiabaokg2002@gmail.com" class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-medium transition hover:border-fog/60">Email me</a>
+      </nav>
+    </main>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ac1531c9c50444fb83a46822716e9cf"}'></script>
+  </body>
+</html>
