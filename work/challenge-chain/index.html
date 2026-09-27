@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0c0d0c" />
+    <title>A step-up authentication engine where the rules are data - Bao Ly</title>
+    <meta name="description" content="How the challenge-chain service decides what a customer has to prove before a sensitive action, and what the design made easier." />
+    <link rel="canonical" href="https://baorlys.dev/work/challenge-chain/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://baorlys.dev/work/challenge-chain/" />
+    <meta property="og:title" content="A step-up authentication engine where the rules are data" />
+    <meta property="og:description" content="How the challenge-chain service decides what a customer has to prove before a sensitive action, and what the design made easier." />
+    <meta property="og:image" content="https://baorlys.dev/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="module" src="/src/case.ts"></script>
+  </head>
+  <body class="grain">
+    <header class="border-b border-line/60">
+      <nav class="mx-auto flex h-16 max-w-3xl items-center justify-between px-5 md:px-8">
+        <a href="/" class="font-mono text-sm font-semibold tracking-tight">bao<span class="text-acid">.</span>ly</a>
+        <a href="/#superapp" class="text-sm text-mute transition hover:text-fog">Back to work</a>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+      <article class="case">
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-acid">Case study, super app</p>
+        <h1 class="mt-5 text-4xl font-semibold leading-[1.08] tracking-tighter md:text-6xl">A step-up authentication engine where the rules are data</h1>
+        <p class="mt-6 text-lg leading-relaxed text-mute">I own the challenge-chain service, which decides what a customer has to prove before a sensitive action. This is how it is put together and what the design made easier.</p>
+
+        <h2>The problem</h2>
+        <p>In a super app, some actions need more than a login: a transfer, a login from a new device, setting a PIN. Each one needs its own checks, and the rules change often. When those rules are branches in code, every change means a code change and a release.</p>
+
+        <h2>How it fits</h2>
+        <p>The BFF knows why a check is needed, so it starts a chain for the action. The app answers each challenge through the gateway. Once the chain is done, the service that performs the action asks the challenge-chain service to confirm the session met the requirement, and only then goes ahead.</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 800 450" role="img" aria-labelledby="d1-title d1-desc">
+            <title id="d1-title">Where the challenge-chain service sits</title>
+            <desc id="d1-desc">The BFF starts a chain, the app answers challenges through the API gateway, the service verifies answers with one adapter per challenge type, keeps sessions in Redis and config plus history in PostgreSQL, and the downstream service validates the session before acting.</desc>
+            <defs>
+              <marker id="d1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" class="d-head" />
+              </marker>
+            </defs>
+
+            <g class="d-box"><rect x="20" y="40" width="150" height="56" rx="12" /><text x="95" y="73">Mobile / web app</text></g>
+            <g class="d-box"><rect x="220" y="40" width="140" height="56" rx="12" /><text x="290" y="73">API gateway</text></g>
+            <g class="d-box"><rect x="220" y="170" width="140" height="56" rx="12" /><text x="290" y="203">BFF</text></g>
+            <g class="d-box"><rect x="20" y="330" width="150" height="70" rx="12" /><text x="95" y="360">Service doing</text><text x="95" y="380">the action</text></g>
+
+            <g class="d-box d-main">
+              <rect x="420" y="120" width="200" height="150" rx="14" />
+              <text x="520" y="158" class="d-strong">Challenge chain</text>
+              <text x="520" y="190" class="d-sub">engine · planner</text>
+              <text x="520" y="212" class="d-sub">validator</text>
+              <text x="520" y="234" class="d-sub">assurance rules</text>
+            </g>
+
+            <g class="d-box">
+              <rect x="660" y="60" width="120" height="270" rx="12" />
+              <text x="720" y="90" class="d-strong">Adapters</text>
+              <text x="720" y="128" class="d-sub">Credential</text>
+              <text x="720" y="158" class="d-sub">OTP</text>
+              <text x="720" y="188" class="d-sub">Selfie</text>
+              <text x="720" y="218" class="d-sub">ID card</text>
+              <text x="720" y="248" class="d-sub">NFC</text>
+              <text x="720" y="278" class="d-sub">PIN, T&amp;C</text>
+            </g>
+
+            <g class="d-box"><rect x="400" y="350" width="110" height="56" rx="12" /><text x="455" y="376">Redis</text><text x="455" y="394" class="d-sub">sessions</text></g>
+            <g class="d-box"><rect x="530" y="350" width="170" height="56" rx="12" /><text x="615" y="376">PostgreSQL</text><text x="615" y="394" class="d-sub">config · history</text></g>
+
+            <g class="d-line">
+              <path d="M170 68 H216" marker-end="url(#d1-arrow)" />
+              <path d="M290 96 V166" marker-end="url(#d1-arrow)" />
+              <path d="M360 198 H416" marker-end="url(#d1-arrow)" />
+              <path d="M360 68 C 420 68, 450 90, 470 116" marker-end="url(#d1-arrow)" />
+              <path d="M620 195 H656" marker-end="url(#d1-arrow)" />
+              <path d="M470 270 V346" marker-end="url(#d1-arrow)" />
+              <path d="M580 270 L600 346" marker-end="url(#d1-arrow)" />
+              <path d="M170 360 C 300 360, 360 300, 416 252" marker-end="url(#d1-arrow)" />
+            </g>
+
+            <g class="d-step">
+              <circle cx="388" cy="182" r="11" /><text x="388" y="186">1</text>
+              <circle cx="432" cy="72" r="11" /><text x="432" y="76">2</text>
+              <circle cx="300" cy="322" r="11" /><text x="300" y="326">3</text>
+            </g>
+            <text x="388" y="222" class="d-label">start</text>
+            <text x="470" y="54" class="d-label">answer</text>
+            <text x="300" y="296" class="d-label">validate</text>
+          </svg>
+          <figcaption>1. The BFF starts a chain for an action. 2. The app answers each challenge. 3. The service doing the action checks the result before it acts.</figcaption>
+        </figure>
+
+        <h2>A chain is data</h2>
+        <p>An action maps to a chain. A chain says what the customer has to prove, and the engine plans the steps that satisfy it. Chains and actions are stored as JSONB and promoted between environments with Liquibase. Versions are append only, so every attempt stays readable against the version it ran on.</p>
+        <p>A login from a new device, for example, can ask for a PIN, a selfie, an ID card photo and an NFC read of the chip. A transfer above a threshold can ask for a selfie on top of an OTP.</p>
+
+        <h2>Assurance levels and floors</h2>
+        <p>Each proving step counts toward one category of evidence, and the categories add up to an assurance level. Each customer tier has a floor in config that an action has to reach. Setting up a PIN or accepting terms counts toward nothing, since enrolling a credential says nothing about who is holding the phone.</p>
+        <table>
+          <thead><tr><th>Challenge</th><th>Evidence it counts as</th></tr></thead>
+          <tbody>
+            <tr><td>Password or PIN</td><td>Knowledge</td></tr>
+            <tr><td>OTP</td><td>Possession</td></tr>
+            <tr><td>Selfie</td><td>Biometric</td></tr>
+            <tr><td>ID card photo</td><td>Document, visual</td></tr>
+            <tr><td>NFC chip read</td><td>Document, chip</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Rules before a version goes live</h2>
+        <p>Every new chain version has to pass a validator before it can be used. Among the rules it enforces:</p>
+        <ul>
+          <li>every step is a challenge type the engine supports</li>
+          <li>an action's chain reaches the floor for its tier</li>
+          <li>a new version cannot lower the level an action already had</li>
+          <li>callers cannot send attributes that only the system may write</li>
+        </ul>
+        <p>All config goes through this one validator, so a config source added later cannot skip it.</p>
+
+        <h2>Inside the service</h2>
+        <p>The service has three modules. <code>core</code> holds the engine, the planner, the validator and the assurance rules, and ArchUnit fails the build if it imports Spring Web, JPA, Redis, Kafka or a vendor SDK. <code>api</code> is the only module that knows HTTP. <code>infra</code> holds one adapter per challenge type, plus the stores. The catalogue of challenge types is built from the registered adapters at startup, and the service refuses to boot if two adapters claim the same type.</p>
+        <p>Sessions live in Redis with a TTL. Config and the attempt history live in PostgreSQL. The start of an attempt is written synchronously before an OTP is spent, so losing Redis never loses the record of what a customer used.</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 800 300" role="img" aria-labelledby="d2-title d2-desc">
+            <title id="d2-title">Module layout of the service</title>
+            <desc id="d2-desc">The api and infra modules both depend on core. Core has no framework or vendor dependencies. Infra implements the ports with adapters, a Redis session store, a PostgreSQL config store and a Caffeine cache.</desc>
+            <defs>
+              <marker id="d2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" class="d-head" />
+              </marker>
+            </defs>
+
+            <g class="d-box">
+              <rect x="20" y="60" width="200" height="180" rx="14" />
+              <text x="120" y="96" class="d-strong">api</text>
+              <text x="120" y="136" class="d-sub">controllers</text>
+              <text x="120" y="162" class="d-sub">DTOs · error envelope</text>
+              <text x="120" y="188" class="d-sub">the only module</text>
+              <text x="120" y="208" class="d-sub">that knows HTTP</text>
+            </g>
+
+            <g class="d-box d-main">
+              <rect x="300" y="40" width="200" height="220" rx="14" />
+              <text x="400" y="78" class="d-strong">core</text>
+              <text x="400" y="118" class="d-sub">engine</text>
+              <text x="400" y="142" class="d-sub">planner · validator</text>
+              <text x="400" y="166" class="d-sub">assurance rules</text>
+              <text x="400" y="190" class="d-sub">ports</text>
+              <text x="400" y="232" class="d-note">no Spring Web, JPA,</text>
+              <text x="400" y="248" class="d-note">Redis, Kafka or SDKs</text>
+            </g>
+
+            <g class="d-box">
+              <rect x="580" y="60" width="200" height="180" rx="14" />
+              <text x="680" y="96" class="d-strong">infra</text>
+              <text x="680" y="136" class="d-sub">one adapter per</text>
+              <text x="680" y="156" class="d-sub">challenge type</text>
+              <text x="680" y="184" class="d-sub">Redis sessions</text>
+              <text x="680" y="206" class="d-sub">PostgreSQL · Caffeine</text>
+            </g>
+
+            <g class="d-line">
+              <path d="M220 150 H296" marker-end="url(#d2-arrow)" />
+              <path d="M580 150 H504" marker-end="url(#d2-arrow)" />
+            </g>
+            <text x="258" y="138" class="d-label">calls</text>
+            <text x="542" y="138" class="d-label">implements</text>
+          </svg>
+          <figcaption>Dependencies point at <code>core</code>, and ArchUnit keeps it that way.</figcaption>
+        </figure>
+
+        <h2>Keeping the hot path cheap</h2>
+        <p>Profiling showed a chain start costing three queries and a switch costing five. I put a Caffeine cache in front of the config reads on the hot path, with TTL-bounded staleness across pods and local invalidation when new config is appended.</p>
+
+        <h2>What it bought</h2>
+        <ul>
+          <li>A new chain or a new threshold is a config change, promoted through environments like any other migration.</li>
+          <li>A new kind of challenge is one new adapter, and the engine stays the same.</li>
+          <li>The assurance level is computed, so a chain cannot claim more than its steps prove.</li>
+          <li>Swapping a vendor stays inside <code>infra</code>.</li>
+        </ul>
+
+        <ul class="chips">
+          <li>Java 25</li>
+          <li>Spring Boot 4</li>
+          <li>PostgreSQL</li>
+          <li>Redis</li>
+          <li>Caffeine</li>
+          <li>Liquibase</li>
+          <li>ArchUnit</li>
+        </ul>
+
+        <p class="note">Details are simplified and the client is not named.</p>
+      </article>
+
+      <nav class="mt-16 flex flex-wrap gap-3 border-t border-line pt-10">
+        <a href="/#superapp" class="inline-flex items-center gap-2 rounded-full bg-acid px-5 py-3 text-sm font-medium text-ink transition hover:bg-fog">Back to work</a>
+        <a href="/work/cif-allocation/" class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-medium transition hover:border-fog/60">Next: CIF pools</a>
+      </nav>
+    </main>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ac1531c9c50444fb83a46822716e9cf"}'></script>
+  </body>
+</html>

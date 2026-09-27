@@ -47,6 +47,7 @@ const PROJECTS: Project[] = [
       { title: 'Satellite services', body: 'MFA, device management, configuration, partner integration and the BFF for web and mobile.' },
     ],
     stack: ['Java 25', 'Spring Boot 4', 'Keycloak', 'Kafka', 'DynamoDB', 'Argo CD'],
+    caseStudy: { label: 'How the challenge chain works', href: '/work/challenge-chain/' },
   },
   {
     id: 'loyalty',

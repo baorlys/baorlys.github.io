@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         cif: resolve(import.meta.dirname, 'work/cif-allocation/index.html'),
+        chain: resolve(import.meta.dirname, 'work/challenge-chain/index.html'),
       },
     },
   },

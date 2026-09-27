@@ -123,4 +123,126 @@ main > section {
     font-size: 0.875rem;
     color: var(--color-mute);
   }
+
+  .case .diagram {
+    margin-top: 2rem;
+    border: 1px solid var(--color-line);
+    border-radius: 1rem;
+    background: var(--color-ink-2);
+    padding: 1.25rem;
+  }
+
+  .case .diagram {
+    overflow-x: auto;
+  }
+
+  .case .diagram svg {
+    display: block;
+    width: 100%;
+    min-width: 620px;
+    height: auto;
+    font-family: var(--font-sans);
+  }
+
+  .case .diagram figcaption {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-mute);
+  }
+
+  .case .d-box rect {
+    fill: var(--color-ink);
+    stroke: var(--color-line);
+    stroke-width: 1.5;
+  }
+
+  .case .d-main rect {
+    stroke: var(--color-acid);
+    fill: color-mix(in oklab, var(--color-acid) 6%, var(--color-ink));
+  }
+
+  .case .d-box text {
+    fill: var(--color-fog);
+    font-size: 15px;
+    text-anchor: middle;
+  }
+
+  .case .d-box .d-strong {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .case .d-main .d-strong {
+    fill: var(--color-acid);
+  }
+
+  .case .d-box .d-sub {
+    fill: var(--color-mute);
+    font-size: 13px;
+  }
+
+  .case .d-box .d-note {
+    fill: var(--color-acid);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .case .d-line path {
+    fill: none;
+    stroke: #5b615a;
+    stroke-width: 1.5;
+  }
+
+  .case .d-head {
+    fill: #5b615a;
+  }
+
+  .case .d-step circle {
+    fill: var(--color-acid);
+  }
+
+  .case .d-step text {
+    fill: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+
+  .case .d-label {
+    fill: var(--color-mute);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-anchor: middle;
+  }
+
+  .case table {
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 36rem;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .case th {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-mute);
+  }
+
+  .case td {
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    color: color-mix(in oklab, var(--color-fog) 82%, transparent);
+  }
+
+  .case td:first-child {
+    color: var(--color-fog);
+  }
 }
