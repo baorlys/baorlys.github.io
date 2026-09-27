@@ -165,10 +165,8 @@ export function Model({ url, size, outline = 0.03 }: { url: string; size: number
 
 export const MODELS = {
   burger: '/models/food/burger.glb',
-  coffee: '/models/food/cup-coffee.glb',
   donut: '/models/food/donut-sprinkles.glb',
   cupcake: '/models/food/cupcake.glb',
-  iceCream: '/models/food/ice-cream.glb',
   taxi: '/models/car/taxi.glb',
   delivery: '/models/car/delivery.glb',
 }

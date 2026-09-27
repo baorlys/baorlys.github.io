@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://baorlys.dev/sitemap.xml

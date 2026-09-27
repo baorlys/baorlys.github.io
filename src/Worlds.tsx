@@ -297,6 +297,38 @@ export function BankCard({ still }: { still: boolean }) {
   )
 }
 
+function Mug({ size }: { size: number }) {
+  const scale = size / 0.9
+  return (
+    <group scale={scale} rotation={[0.35, 0, 0]}>
+      <mesh>
+        <cylinderGeometry args={[0.3, 0.26, 0.6, 32]} />
+        <Toon color="#fff4e6" />
+        <Outline thickness={0.02} />
+      </mesh>
+      <mesh position={[0, 0.301, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.26, 32]} />
+        <Toon color="#6b3f22" />
+      </mesh>
+      <mesh position={[0, -0.05, 0]}>
+        <cylinderGeometry args={[0.305, 0.285, 0.14, 32]} />
+        <Toon color="#ff7a85" />
+      </mesh>
+      <mesh position={[0.33, 0.02, 0]} rotation={[0, 0, -Math.PI / 2]}>
+        <torusGeometry args={[0.14, 0.045, 12, 24, Math.PI]} />
+        <Toon color="#fff4e6" />
+        <Outline thickness={0.015} />
+      </mesh>
+      {[-0.1, 0.1].map((x, i) => (
+        <mesh key={x} position={[x, 0.5 + i * 0.06, 0]} rotation={[0, 0, i ? 0.3 : -0.3]}>
+          <capsuleGeometry args={[0.035, 0.16, 6, 12]} />
+          <meshBasicMaterial color={FOG} transparent opacity={0.55} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 function HealthIcon() {
   return (
     <group>
@@ -346,7 +378,7 @@ const ORBITERS: { tile: string; icon: ReactNode }[] = [
   { tile: '#ffb86b', icon: <Model url={MODELS.burger} size={0.55} /> },
   { tile: '#ffd84d', icon: <Model url={MODELS.taxi} size={0.62} outline={0.02} /> },
   { tile: '#7ad7f0', icon: <Model url={MODELS.delivery} size={0.62} outline={0.02} /> },
-  { tile: '#d9a878', icon: <Model url={MODELS.coffee} size={0.5} /> },
+  { tile: '#d9a878', icon: <Mug size={0.5} /> },
   { tile: '#ff7a85', icon: <HealthIcon /> },
   { tile: '#a38bff', icon: <GiftIcon /> },
 ]
@@ -516,7 +548,7 @@ function FoodCluster({ still }: { still: boolean }) {
     <group>
       <Float speed={speed} floatIntensity={0.6} rotationIntensity={0.4}>
         <group position={[0, 0.5, 0]} rotation={[0.25, -0.4, 0]}>
-          <Model url={MODELS.coffee} size={0.95} />
+          <Mug size={0.85} />
         </group>
       </Float>
       <Float speed={speed * 1.2} floatIntensity={0.5} rotationIntensity={0.6}>

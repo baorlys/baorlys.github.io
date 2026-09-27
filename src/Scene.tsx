@@ -95,11 +95,11 @@ function Core({ still }: { still: boolean }) {
     <group>
       <mesh ref={shell}>
         <icosahedronGeometry args={[0.5, 0]} />
-        <meshPhysicalMaterial color={FOG} roughness={0.08} metalness={0.1} clearcoat={1} transparent opacity={0.28} depthWrite={false} />
-        <Edges color={ACID} threshold={1} transparent opacity={0.55} />
+        <meshPhysicalMaterial color={FOG} emissive={ACID} emissiveIntensity={0.08} roughness={0.05} metalness={0} clearcoat={1} transparent opacity={0.16} depthWrite={false} />
+        <Edges color={GLOW} threshold={1} toneMapped={false} />
       </mesh>
       <mesh ref={heart}>
-        <sphereGeometry args={[0.09, 16, 12]} />
+        <sphereGeometry args={[0.12, 16, 12]} />
         <meshBasicMaterial color={GLOW} toneMapped={false} />
       </mesh>
       <group ref={orbit} rotation={[1.1, 0.3, 0]}>

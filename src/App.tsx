@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight, GithubLogo, LinkedinLogo } from '@phosphor-icons/react'
+import { ArrowDownRight, ArrowUpRight, FilePdf, GithubLogo, LinkedinLogo } from '@phosphor-icons/react'
 import { domAnimation, LazyMotion, m, useReducedMotion } from 'motion/react'
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import type { Focus } from './Scene'
@@ -8,6 +8,7 @@ const Scene = lazy(() => import('./Scene'))
 const EMAIL = 'lygiabaokg2002@gmail.com'
 const GITHUB = 'https://github.com/baorlys'
 const LINKEDIN = 'https://www.linkedin.com/in/baorlys'
+const RESUME = '/resume.pdf'
 
 type Project = {
   id: 'bank' | 'superapp' | 'loyalty'
@@ -143,6 +144,17 @@ function useMediaQuery(query: string) {
   return matches
 }
 
+function useIdleReady() {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    const start = () => ('requestIdleCallback' in window ? requestIdleCallback(() => setReady(true), { timeout: 1500 }) : setTimeout(() => setReady(true), 300))
+    if (document.readyState === 'complete') start()
+    else window.addEventListener('load', start, { once: true })
+    return () => window.removeEventListener('load', start)
+  }, [])
+  return ready
+}
+
 function useActiveFocus() {
   const [focus, setFocus] = useState<Focus>('hero')
   useEffect(() => {
@@ -190,7 +202,7 @@ function Reveal({ children, delay = 0, className }: { children: ReactNode; delay
 }
 
 function PillLink({ href, children, primary = false }: { href: string; children: ReactNode; primary?: boolean }) {
-  const external = href.startsWith('http')
+  const external = href.startsWith('http') || href.endsWith('.pdf')
   return (
     <a
       href={href}
@@ -216,6 +228,7 @@ function Nav() {
           <a href="#bank" className="hidden transition hover:text-fog sm:block">Work</a>
           <a href="#experience" className="hidden transition hover:text-fog sm:block">Experience</a>
           <a href="#approach" className="hidden transition hover:text-fog sm:block">Approach</a>
+          <a href={RESUME} target="_blank" rel="noreferrer" className="hidden transition hover:text-fog sm:block">Resume</a>
           <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="GitHub" className="transition hover:text-fog">
             <GithubLogo size={20} />
           </a>
@@ -239,7 +252,7 @@ function Hero() {
         <m.p {...rise(0.1)} className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-acid">
           Bao Ly, Backend Engineer
         </m.p>
-        <m.h1 {...rise(0.2)} className="text-5xl font-semibold leading-[1.02] tracking-tighter md:text-6xl lg:text-7xl">
+        <m.h1 {...rise(0.2)} initial={reduce ? false : { opacity: 0.4, y: 24 }} className="text-5xl font-semibold leading-[1.02] tracking-tighter md:text-6xl lg:text-7xl">
           I build the backend that moves money.
         </m.h1>
         <m.p {...rise(0.35)} className="mt-6 max-w-md text-lg leading-relaxed text-mute">
@@ -299,8 +312,8 @@ function Experience() {
         </Reveal>
         <ol className="relative mt-12 border-l border-line pl-8">
           {EXPERIENCE.map((item, i) => (
-            <Reveal key={item.title} delay={0.08 * i} className="relative pb-9 last:pb-0">
-              <li>
+            <li key={item.title} className="relative pb-9 last:pb-0">
+              <Reveal delay={0.08 * i}>
                 <span
                   aria-hidden
                   className={`absolute -left-[38px] top-1.5 size-3 rounded-full ${item.current ? 'bg-acid ring-4 ring-acid/20' : 'border border-mute bg-ink'}`}
@@ -322,8 +335,8 @@ function Experience() {
                     ))}
                   </div>
                 )}
-              </li>
-            </Reveal>
+              </Reveal>
+            </li>
           ))}
         </ol>
       </div>
@@ -397,6 +410,9 @@ function Contact() {
           </a>
         </Reveal>
         <div className="mt-16 flex flex-wrap gap-3">
+          <PillLink href={RESUME}>
+            <FilePdf size={18} /> Resume
+          </PillLink>
           <PillLink href={LINKEDIN}>
             <LinkedinLogo size={18} /> LinkedIn
           </PillLink>
@@ -419,6 +435,7 @@ export default function App() {
   const reduce = useReducedMotion() ?? false
   const wide = useMediaQuery('(min-width: 768px)')
   const focus = useActiveFocus()
+  const sceneReady = useIdleReady()
   useVimNavigation(reduce)
 
   return (
@@ -430,7 +447,7 @@ export default function App() {
         >
           <SceneBoundary>
             <Suspense fallback={null}>
-              <Scene focus={focus} wide={wide} still={reduce} />
+              {sceneReady && <Scene focus={focus} wide={wide} still={reduce} />}
             </Suspense>
           </SceneBoundary>
         </div>

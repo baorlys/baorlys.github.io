@@ -1,32 +1,26 @@
-# React + TypeScript + Vite
+# baorlys.dev
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Source for my portfolio site, live at https://baorlys.dev.
 
-Currently, two official plugins are available:
+The site is one page with a 3D scene for each section: a service network for the intro, a bank card for the digital bank work, a phone with mini-apps for the super app, and a ring of coins for the loyalty platform. Scrolling snaps from section to section, and each scene slides in from the direction you scroll.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+React 19, Vite, Tailwind CSS v4, three.js through React Three Fiber and drei, postprocessing for bloom, and Motion for the text reveals.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Run it
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+pnpm install
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+`pnpm build` writes a static site to `dist/`.
+
+## Deploy
+
+Every push to `main` builds the site and publishes it to GitHub Pages through `.github/workflows/deploy.yml`. The custom domain is set in `public/CNAME`.
+
+## Credits
+
+The burger, donut, cupcake, taxi and delivery van models come from Kenney's Food Kit and Car Kit, released under CC0. The license file is in `public/models/`.
