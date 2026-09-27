@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0c0d0c" />
+    <title>Xác thực bổ sung mà luật chơi nằm trong config - Lý Gia Bảo</title>
+    <meta name="description" content="Challenge-chain service quyết định khách phải chứng minh những gì trước khi làm một việc nhạy cảm, và nó giúp team nhẹ gánh ở đâu." />
+    <link rel="canonical" href="https://baorlys.dev/vi/work/challenge-chain/" />
+    <link rel="alternate" hreflang="en" href="https://baorlys.dev/work/challenge-chain/" />
+    <link rel="alternate" hreflang="vi" href="https://baorlys.dev/vi/work/challenge-chain/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:url" content="https://baorlys.dev/vi/work/challenge-chain/" />
+    <meta property="og:title" content="Xác thực bổ sung mà luật chơi nằm trong config" />
+    <meta property="og:description" content="Challenge-chain service quyết định khách phải chứng minh những gì trước khi làm một việc nhạy cảm, và nó giúp team nhẹ gánh ở đâu." />
+    <meta property="og:image" content="https://baorlys.dev/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="module" src="/src/case.ts"></script>
+  </head>
+  <body class="grain">
+    <header class="border-b border-line/60">
+      <nav class="mx-auto flex h-16 max-w-3xl items-center justify-between px-5 md:px-8">
+        <a href="/vi/" class="font-mono text-sm font-semibold tracking-tight">bao<span class="text-acid">.</span>ly</a>
+        <div class="flex items-center gap-5">
+          <a href="/work/challenge-chain/" hreflang="en" lang="en" aria-label="English" class="font-mono text-xs font-semibold tracking-wider text-mute transition hover:text-acid">EN</a>
+          <a href="/vi/#superapp" class="text-sm text-mute transition hover:text-fog">Về trang dự án</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+      <article class="case">
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-acid">Case study, super app</p>
+        <h1 class="mt-5 text-4xl font-semibold leading-[1.12] tracking-tighter md:text-6xl">Xác thực bổ sung mà luật chơi nằm trong config</h1>
+        <p class="mt-6 text-lg leading-relaxed text-mute">Mình phụ trách challenge-chain service, chỗ quyết định khách phải chứng minh những gì trước khi làm một việc nhạy cảm. Đây là cách nó được ráp lại, và nó giúp team nhẹ gánh ở đâu.</p>
+
+        <h2>Bài toán</h2>
+        <p>Trong super app, có việc chỉ đăng nhập thôi là chưa đủ: chuyển tiền, đăng nhập trên máy mới, đặt PIN. Mỗi việc cần một bộ kiểm tra riêng, và luật thì đổi liên tục. Nếu luật nằm trong code dưới dạng if-else, đổi một luật là sửa code rồi release.</p>
+
+        <h2>Nó nằm ở đâu</h2>
+        <p>BFF biết vì sao cần kiểm tra nên nó mở chain cho hành động đó. App trả lời từng challenge qua gateway. Xong chain, service thực hiện hành động hỏi lại challenge-chain service xem phiên đã đạt yêu cầu chưa, đạt rồi mới làm.</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 800 450" role="img" aria-labelledby="vd1-title vd1-desc">
+            <title id="vd1-title">Challenge-chain service nằm ở đâu</title>
+            <desc id="vd1-desc">BFF mở chain, app trả lời challenge qua API gateway, service kiểm tra câu trả lời bằng mỗi loại challenge một adapter, giữ phiên trong Redis, config và lịch sử trong PostgreSQL, còn service thực hiện hành động kiểm tra phiên trước khi làm.</desc>
+            <defs>
+              <marker id="vd1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" class="d-head" />
+              </marker>
+            </defs>
+
+            <g class="d-box"><rect x="20" y="40" width="150" height="56" rx="12" /><text x="95" y="73">App mobile / web</text></g>
+            <g class="d-box"><rect x="220" y="40" width="140" height="56" rx="12" /><text x="290" y="73">API gateway</text></g>
+            <g class="d-box"><rect x="220" y="170" width="140" height="56" rx="12" /><text x="290" y="203">BFF</text></g>
+            <g class="d-box"><rect x="20" y="330" width="150" height="70" rx="12" /><text x="95" y="360">Service thực hiện</text><text x="95" y="380">hành động</text></g>
+
+            <g class="d-box d-main">
+              <rect x="420" y="120" width="200" height="150" rx="14" />
+              <text x="520" y="158" class="d-strong">Challenge chain</text>
+              <text x="520" y="190" class="d-sub">engine · planner</text>
+              <text x="520" y="212" class="d-sub">validator</text>
+              <text x="520" y="234" class="d-sub">assurance rules</text>
+            </g>
+
+            <g class="d-box">
+              <rect x="660" y="60" width="120" height="270" rx="12" />
+              <text x="720" y="90" class="d-strong">Adapter</text>
+              <text x="720" y="128" class="d-sub">Credential</text>
+              <text x="720" y="158" class="d-sub">OTP</text>
+              <text x="720" y="188" class="d-sub">Selfie</text>
+              <text x="720" y="218" class="d-sub">ID card</text>
+              <text x="720" y="248" class="d-sub">NFC</text>
+              <text x="720" y="278" class="d-sub">PIN, T&amp;C</text>
+            </g>
+
+            <g class="d-box"><rect x="400" y="350" width="110" height="56" rx="12" /><text x="455" y="376">Redis</text><text x="455" y="394" class="d-sub">phiên</text></g>
+            <g class="d-box"><rect x="530" y="350" width="170" height="56" rx="12" /><text x="615" y="376">PostgreSQL</text><text x="615" y="394" class="d-sub">config · lịch sử</text></g>
+
+            <g class="d-line">
+              <path d="M170 68 H216" marker-end="url(#vd1-arrow)" />
+              <path d="M290 96 V166" marker-end="url(#vd1-arrow)" />
+              <path d="M360 198 H416" marker-end="url(#vd1-arrow)" />
+              <path d="M360 68 C 420 68, 450 90, 470 116" marker-end="url(#vd1-arrow)" />
+              <path d="M620 195 H656" marker-end="url(#vd1-arrow)" />
+              <path d="M470 270 V346" marker-end="url(#vd1-arrow)" />
+              <path d="M580 270 L600 346" marker-end="url(#vd1-arrow)" />
+              <path d="M170 360 C 300 360, 360 300, 416 252" marker-end="url(#vd1-arrow)" />
+            </g>
+
+            <g class="d-step">
+              <circle cx="388" cy="182" r="11" /><text x="388" y="186">1</text>
+              <circle cx="432" cy="72" r="11" /><text x="432" y="76">2</text>
+              <circle cx="300" cy="322" r="11" /><text x="300" y="326">3</text>
+            </g>
+            <text x="388" y="222" class="d-label">mở</text>
+            <text x="470" y="54" class="d-label">trả lời</text>
+            <text x="300" y="296" class="d-label">kiểm tra</text>
+          </svg>
+          <figcaption>1. BFF mở chain cho một hành động. 2. App trả lời từng challenge. 3. Service thực hiện hành động kiểm tra kết quả rồi mới làm.</figcaption>
+        </figure>
+
+        <h2>Chain là dữ liệu</h2>
+        <p>Mỗi hành động gắn với một chain. Chain nói khách phải chứng minh điều gì, còn engine tự lên kế hoạch các bước để đáp ứng. Chain và action lưu dạng JSONB, được đưa qua các môi trường bằng Liquibase. Version chỉ được thêm, không bao giờ sửa, nên lần thử nào cũng đọc lại được theo đúng version nó đã chạy.</p>
+        <p>Ví dụ, đăng nhập trên máy mới có thể đòi PIN, selfie, ảnh giấy tờ và quét chip NFC. Chuyển tiền vượt ngưỡng thì đòi thêm selfie ngoài OTP.</p>
+
+        <h2>Mức đảm bảo và mức sàn</h2>
+        <p>Mỗi bước chứng minh được tính vào một loại bằng chứng, cộng lại thành mức đảm bảo. Mỗi hạng khách có một mức sàn trong config mà hành động phải đạt. Đặt PIN hay đồng ý điều khoản thì không cộng điểm nào, vì đăng ký credential chẳng nói lên được ai đang cầm điện thoại.</p>
+        <table>
+          <thead><tr><th>Challenge</th><th>Tính là bằng chứng gì</th></tr></thead>
+          <tbody>
+            <tr><td>Mật khẩu hoặc PIN</td><td>Thứ mình biết</td></tr>
+            <tr><td>OTP</td><td>Thứ mình có</td></tr>
+            <tr><td>Selfie</td><td>Sinh trắc học</td></tr>
+            <tr><td>Ảnh giấy tờ</td><td>Giấy tờ, ảnh chụp</td></tr>
+            <tr><td>Quét chip NFC</td><td>Giấy tờ, chip</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Luật trước khi version lên sóng</h2>
+        <p>Version chain mới nào cũng phải qua validator mới được dùng. Vài luật tiêu biểu:</p>
+        <ul>
+          <li>bước nào cũng phải là loại challenge mà engine hỗ trợ</li>
+          <li>chain của một hành động phải đạt mức sàn của hạng khách</li>
+          <li>version mới không được hạ mức mà hành động đang có</li>
+          <li>caller không được gửi những attribute chỉ hệ thống mới được ghi</li>
+        </ul>
+        <p>Mọi config đều đi qua đúng một validator này, nên nguồn config thêm vào sau cũng không lách được.</p>
+
+        <h2>Bên trong service</h2>
+        <p>Service có ba module. <code>core</code> chứa engine, planner, validator và luật đảm bảo, ArchUnit đánh fail build nếu nó dám import Spring Web, JPA, Redis, Kafka hay SDK của vendor. <code>api</code> là module duy nhất biết HTTP. <code>infra</code> giữ mỗi loại challenge một adapter, cộng với các store. Danh mục challenge được dựng từ các adapter đã đăng ký lúc khởi động, hai adapter giành cùng một loại là service không chịu boot.</p>
+        <p>Phiên nằm trong Redis có TTL. Config và lịch sử lần thử nằm trong PostgreSQL. Lúc bắt đầu một lần thử được ghi đồng bộ trước khi OTP bị dùng, nên Redis có mất thì dấu vết khách đã dùng gì vẫn còn.</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 800 300" role="img" aria-labelledby="vd2-title vd2-desc">
+            <title id="vd2-title">Các module của service</title>
+            <desc id="vd2-desc">Module api và infra đều phụ thuộc vào core. Core không dính framework hay vendor nào. Infra hiện thực các port bằng adapter, store phiên trong Redis, store config trong PostgreSQL và Caffeine cache.</desc>
+            <defs>
+              <marker id="vd2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" class="d-head" />
+              </marker>
+            </defs>
+
+            <g class="d-box">
+              <rect x="20" y="60" width="200" height="180" rx="14" />
+              <text x="120" y="96" class="d-strong">api</text>
+              <text x="120" y="136" class="d-sub">controller</text>
+              <text x="120" y="162" class="d-sub">DTO · error envelope</text>
+              <text x="120" y="188" class="d-sub">module duy nhất</text>
+              <text x="120" y="208" class="d-sub">biết HTTP</text>
+            </g>
+
+            <g class="d-box d-main">
+              <rect x="300" y="40" width="200" height="220" rx="14" />
+              <text x="400" y="78" class="d-strong">core</text>
+              <text x="400" y="118" class="d-sub">engine</text>
+              <text x="400" y="142" class="d-sub">planner · validator</text>
+              <text x="400" y="166" class="d-sub">luật đảm bảo</text>
+              <text x="400" y="190" class="d-sub">port</text>
+              <text x="400" y="232" class="d-note">không Spring Web, JPA,</text>
+              <text x="400" y="248" class="d-note">Redis, Kafka hay SDK</text>
+            </g>
+
+            <g class="d-box">
+              <rect x="580" y="60" width="200" height="180" rx="14" />
+              <text x="680" y="96" class="d-strong">infra</text>
+              <text x="680" y="136" class="d-sub">mỗi loại challenge</text>
+              <text x="680" y="156" class="d-sub">một adapter</text>
+              <text x="680" y="184" class="d-sub">phiên trong Redis</text>
+              <text x="680" y="206" class="d-sub">PostgreSQL · Caffeine</text>
+            </g>
+
+            <g class="d-line">
+              <path d="M220 150 H296" marker-end="url(#vd2-arrow)" />
+              <path d="M580 150 H504" marker-end="url(#vd2-arrow)" />
+            </g>
+            <text x="258" y="138" class="d-label">gọi</text>
+            <text x="542" y="138" class="d-label">hiện thực</text>
+          </svg>
+          <figcaption>Mọi phụ thuộc đều chĩa vào <code>core</code>, và ArchUnit canh giữ chuyện đó.</figcaption>
+        </figure>
+
+        <h2>Giữ đường nóng nhẹ nhàng</h2>
+        <p>Profiling cho thấy mỗi lần start chain tốn ba query, mỗi lần switch tốn năm. Mình đặt Caffeine cache trước phần đọc config trên đường nóng, dữ liệu giữa các pod chỉ cũ tối đa bằng TTL, và cache được xoá tại chỗ khi có config mới thêm vào.</p>
+
+        <h2>Được gì</h2>
+        <ul>
+          <li>Thêm chain mới hay đổi ngưỡng chỉ là đổi config, đi qua các môi trường như mọi migration khác.</li>
+          <li>Thêm một kiểu challenge mới là thêm một adapter, engine giữ nguyên.</li>
+          <li>Mức đảm bảo được tính ra, nên chain không thể khai nhiều hơn những gì các bước chứng minh.</li>
+          <li>Đổi vendor thì chỉ đụng tới <code>infra</code>.</li>
+        </ul>
+
+        <ul class="chips">
+          <li>Java 25</li>
+          <li>Spring Boot 4</li>
+          <li>PostgreSQL</li>
+          <li>Redis</li>
+          <li>Caffeine</li>
+          <li>Liquibase</li>
+          <li>ArchUnit</li>
+        </ul>
+
+        <p class="note">Chi tiết đã được đơn giản hoá và không nêu tên khách hàng.</p>
+      </article>
+
+      <nav class="mt-16 flex flex-wrap gap-3 border-t border-line pt-10">
+        <a href="/vi/#superapp" class="inline-flex items-center gap-2 rounded-full bg-acid px-5 py-3 text-sm font-medium text-ink transition hover:bg-fog">Về trang dự án</a>
+        <a href="/vi/work/cif-allocation/" class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-medium transition hover:border-fog/60">Tiếp: pool CIF</a>
+      </nav>
+    </main>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ac1531c9c50444fb83a46822716e9cf"}'></script>
+  </body>
+</html>

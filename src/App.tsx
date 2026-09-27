@@ -1,6 +1,7 @@
 import { ArrowDownRight, ArrowUpRight, FilePdf, GithubLogo, LinkedinLogo } from '@phosphor-icons/react'
 import { domAnimation, LazyMotion, m, useReducedMotion } from 'motion/react'
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
+import { COPY, LANG, type Project } from './copy'
 import type { Focus } from './Scene'
 
 const Scene = lazy(() => import('./Scene'))
@@ -9,102 +10,6 @@ const EMAIL = 'lygiabaokg2002@gmail.com'
 const GITHUB = 'https://github.com/baorlys'
 const LINKEDIN = 'https://www.linkedin.com/in/baorlys'
 const RESUME = '/resume.pdf'
-
-type Project = {
-  id: 'bank' | 'superapp' | 'loyalty'
-  name: string
-  summary: string
-  metric: { value: string; label: string }
-  highlights: { title: string; body: string }[]
-  stack: string[]
-  caseStudy?: { label: string; href: string }
-}
-
-const PROJECTS: Project[] = [
-  {
-    id: 'bank',
-    name: 'Digital Bank',
-    summary: 'A licensed digital bank with 3 million customers, run by a fintech group. I work in the onboarding and eVoucher teams.',
-    metric: { value: '11,000', label: 'customer IDs allocated a day, zero duplicates' },
-    highlights: [
-      { title: 'CIF allocation', body: 'Per-type pools with Feistel-based IDs, claimed through FOR UPDATE SKIP LOCKED so pods never queue.' },
-      { title: 'eVoucher issuance', body: 'One orchestration over two partner APIs, safe to replay under retries and Kafka redelivery.' },
-      { title: 'Onboarding session', body: 'KYC, ID card, NFC and face-check evidence in one DynamoDB aggregate, created idempotently.' },
-      { title: 'Pool backpressure', body: 'Capped refill batches so a drained pool cannot stampede the database, plus reclaim for crashed pods.' },
-    ],
-    stack: ['Java', 'Spring Boot 3', 'PostgreSQL', 'Kafka', 'AWS KMS', 'EKS'],
-    caseStudy: { label: 'How the CIF pools work', href: '/work/cif-allocation/' },
-  },
-  {
-    id: 'superapp',
-    name: 'Super App',
-    summary: 'A consumer super app hosting partner mini-apps under one login. I build the identity and session services.',
-    metric: { value: 'Java 25', label: 'onboarding service built from scratch on Spring Boot 4' },
-    highlights: [
-      { title: 'Challenge chain', body: 'Versioned step-up authentication with assurance floors per customer tier, cached on the hot path.' },
-      { title: 'Mini-app access', body: 'A Keycloak SPI that limits which mini-app APIs each client reaches, with a pseudonymous token subject.' },
-      { title: 'Onboarding service', body: 'Clean Architecture, Liquibase, Kafka, OpenAPI and WireMock tests, shipped through to staging.' },
-      { title: 'Satellite services', body: 'MFA, device management, configuration, partner integration and the BFF for web and mobile.' },
-    ],
-    stack: ['Java 25', 'Spring Boot 4', 'Keycloak', 'Kafka', 'DynamoDB', 'Argo CD'],
-    caseStudy: { label: 'How the challenge chain works', href: '/work/challenge-chain/' },
-  },
-  {
-    id: 'loyalty',
-    name: 'Loyalty Platform',
-    summary: 'One points and rewards domain shared by F&B chains and healthcare clinics, so members earn in one place and redeem in another.',
-    metric: { value: '6-8s', label: 'report exports, down from 20-30s' },
-    highlights: [
-      { title: 'Points ledger', body: 'Concurrency controls that keep balances correct when one transaction draws on several funding sources.' },
-      { title: 'Search sync', body: 'MariaDB to Elasticsearch through a transactional outbox, strictly ordered and with no dual writes.' },
-      { title: 'E-invoicing', body: 'A vendor-agnostic signing layer that keeps invoices compliant with tax authority rules.' },
-      { title: 'Reporting', body: 'Rewritten queries and lower JVM allocation for the heavy Excel exports merchants run.' },
-    ],
-    stack: ['Java', 'Spring Boot', 'MariaDB', 'Elasticsearch', 'Docker'],
-  },
-]
-
-type Milestone = {
-  period: string
-  title: string
-  role: string
-  body: string
-  current?: boolean
-  work?: { label: string; href: string }[]
-}
-
-const EXPERIENCE: Milestone[] = [
-  {
-    period: 'Oct 2025 - now',
-    title: 'CMC Global',
-    role: 'Backend Engineer, on site at a fintech group',
-    body: 'Led a three-engineer squad for six months. Rated a top performer by the client.',
-    current: true,
-    work: [
-      { label: 'Digital Bank', href: '#bank' },
-      { label: 'Super App', href: '#superapp' },
-    ],
-  },
-  {
-    period: 'Jun - Sep 2025',
-    title: 'ID Solutions',
-    role: 'Software Engineer, contract',
-    body: 'Backend for a loyalty platform serving F&B and healthcare merchants.',
-    work: [{ label: 'Loyalty Platform', href: '#loyalty' }],
-  },
-  {
-    period: 'May 2024 - Jun 2025',
-    title: 'NashTech, bbv Vietnam',
-    role: 'Software Engineer Intern, full-time',
-    body: 'Multi-tenant digital asset management, RabbitMQ image processing, and a notification service for voice, SMS and email.',
-  },
-  {
-    period: '2020 - 2026',
-    title: 'Ton Duc Thang University',
-    role: 'B.Eng. Software Engineering',
-    body: 'Competed on the ICPC regional team in 2022 and 2023.',
-  },
-]
 
 const STACK = [
   ['openjdk', 'Java'],
@@ -228,14 +133,17 @@ function Nav() {
           bao<span className="text-acid">.</span>ly
         </a>
         <div className="flex items-center gap-6 text-sm text-mute">
-          <a href="#bank" className="hidden transition hover:text-fog sm:block">Work</a>
-          <a href="#experience" className="hidden transition hover:text-fog sm:block">Experience</a>
-          <a href="#approach" className="hidden transition hover:text-fog sm:block">Approach</a>
-          <a href={RESUME} target="_blank" rel="noreferrer" className="hidden transition hover:text-fog sm:block">Resume</a>
+          <a href="#bank" className="hidden transition hover:text-fog sm:block">{COPY.nav.work}</a>
+          <a href="#experience" className="hidden transition hover:text-fog sm:block">{COPY.nav.experience}</a>
+          <a href="#approach" className="hidden transition hover:text-fog sm:block">{COPY.nav.approach}</a>
+          <a href={RESUME} target="_blank" rel="noreferrer" className="hidden transition hover:text-fog sm:block">{COPY.nav.resume}</a>
           <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="GitHub" className="transition hover:text-fog">
             <GithubLogo size={20} />
           </a>
-          <PillLink href={`mailto:${EMAIL}`}>Email me</PillLink>
+          <a href={COPY.nav.switchHref} hrefLang={COPY.nav.switchHref === '/' ? 'en' : 'vi'} lang={COPY.nav.switchHref === '/' ? 'en' : 'vi'} aria-label={COPY.nav.switchName} className="font-mono text-xs font-semibold tracking-wider transition hover:text-acid">
+            {COPY.nav.switchLabel}
+          </a>
+          <PillLink href={`mailto:${EMAIL}`}>{COPY.nav.email}</PillLink>
         </div>
       </nav>
     </header>
@@ -253,19 +161,19 @@ function Hero() {
     <section id="top" data-focus="hero" className="mx-auto flex min-h-[100dvh] max-w-7xl items-end px-5 pb-20 pt-24 md:items-center md:px-8 md:pb-0">
       <div className="max-w-xl">
         <m.p {...rise(0.1)} className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-acid">
-          Bao Ly, Backend Engineer
+          {COPY.hero.eyebrow}
         </m.p>
-        <m.h1 {...rise(0.2)} initial={reduce ? false : { opacity: 0.4, y: 24 }} className="text-5xl font-semibold leading-[1.02] tracking-tighter md:text-6xl lg:text-7xl">
-          I build the backend that moves money.
+        <m.h1 {...rise(0.2)} initial={reduce ? false : { opacity: 0.4, y: 24 }} className={`font-semibold tracking-tighter ${LANG === 'vi' ? 'text-5xl leading-[1.12] md:text-6xl' : 'text-5xl leading-[1.02] md:text-6xl lg:text-7xl'}`}>
+          {COPY.hero.title}
         </m.h1>
         <m.p {...rise(0.35)} className="mt-6 max-w-md text-lg leading-relaxed text-mute">
-          Two years building onboarding and identity backends for a 3-million-customer digital bank and a fintech super app.
+          {COPY.hero.sub}
         </m.p>
         <m.div {...rise(0.5)} className="mt-10 flex flex-wrap gap-3">
           <PillLink href="#bank" primary>
-            See the work <ArrowDownRight size={16} weight="bold" />
+            {COPY.hero.ctaWork} <ArrowDownRight size={16} weight="bold" />
           </PillLink>
-          <PillLink href={`mailto:${EMAIL}`}>Email me</PillLink>
+          <PillLink href={`mailto:${EMAIL}`}>{COPY.hero.ctaEmail}</PillLink>
         </m.div>
       </div>
     </section>
@@ -320,10 +228,10 @@ function Experience() {
     <section id="experience" data-focus="experience" className="mx-auto flex min-h-[100dvh] max-w-7xl items-start px-5 pb-24 pt-[48dvh] md:items-center md:px-8 md:py-24">
       <div className="max-w-xl rounded-2xl bg-ink/90 p-6 md:max-w-[50%] md:bg-transparent md:p-0 lg:max-w-xl">
         <Reveal>
-          <h2 className="text-4xl font-semibold tracking-tighter md:text-5xl">Experience</h2>
+          <h2 className="text-4xl font-semibold tracking-tighter md:text-5xl">{COPY.experienceTitle}</h2>
         </Reveal>
         <ol className="relative mt-12 border-l border-line pl-8">
-          {EXPERIENCE.map((item, i) => (
+          {COPY.experience.map((item, i) => (
             <li key={item.title} className="relative pb-9 last:pb-0">
               <Reveal delay={0.08 * i}>
                 <span
@@ -377,28 +285,30 @@ function Approach() {
         <div className="grid gap-4 md:grid-cols-6">
           <Reveal className={`${cell} bg-[radial-gradient(120%_120%_at_0%_0%,rgba(184,243,106,0.12),transparent_55%)] md:col-span-4`}>
             <h2 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tighter md:text-5xl">
-              Banking code gets one chance to be <span className="text-acid">right</span>.
+              {COPY.approach.title[0]}
+              <span className="text-acid">{COPY.approach.title[1]}</span>
+              {COPY.approach.title[2]}
             </h2>
             <p className="mt-6 max-w-[52ch] leading-relaxed text-mute">
-              Money and identity flows get idempotency, clear error codes and tests on real config before any tuning.
+              {COPY.approach.body}
             </p>
           </Reveal>
           <Reveal delay={0.06} className={`${cell} flex flex-col justify-between border-acid bg-acid text-ink md:col-span-2`}>
             <p className="font-mono text-6xl font-medium tracking-tight">14</p>
             <p className="mt-8 leading-relaxed">
-              skills in the team&rsquo;s Claude Code plugin I wrote, turning our conventions into checks that run on every change.
+              {COPY.approach.skills}
             </p>
           </Reveal>
           <Reveal delay={0.1} className={`${cell} bg-ink md:col-span-2`}>
-            <h3 className="text-xl font-medium">Profile, then cache</h3>
-            <p className="mt-3 leading-relaxed text-mute">The challenge chain got a cache only after profiling showed three queries per start and five per switch.</p>
+            <h3 className="text-xl font-medium">{COPY.approach.cacheTitle}</h3>
+            <p className="mt-3 leading-relaxed text-mute">{COPY.approach.cacheBody}</p>
           </Reveal>
           <Reveal delay={0.14} className={`${cell} bg-ink md:col-span-2`}>
-            <h3 className="text-xl font-medium">Write it down</h3>
-            <p className="mt-3 leading-relaxed text-mute">A design doc for every cross-service decision, so the next engineer does not have to guess.</p>
+            <h3 className="text-xl font-medium">{COPY.approach.docTitle}</h3>
+            <p className="mt-3 leading-relaxed text-mute">{COPY.approach.docBody}</p>
           </Reveal>
           <Reveal delay={0.18} className={`${cell} bg-ink md:col-span-2`}>
-            <h3 className="sr-only">Tech stack</h3>
+            <h3 className="sr-only">{COPY.approach.stack}</h3>
             <StackGrid />
           </Reveal>
         </div>
@@ -412,7 +322,7 @@ function Contact() {
     <section data-focus="rest" className="flex min-h-[100dvh] flex-col bg-ink">
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 py-28 md:px-8">
         <Reveal>
-          <h2 className="text-3xl font-semibold tracking-tighter text-mute md:text-4xl">Building something that has to hold?</h2>
+          <h2 className="text-3xl font-semibold tracking-tighter text-mute md:text-4xl">{COPY.contact.title}</h2>
           <a
             href={`mailto:${EMAIL}`}
             className="group mt-6 inline-flex max-w-full items-center gap-4 break-all text-3xl font-semibold tracking-tighter transition hover:text-acid sm:text-5xl lg:text-7xl"
@@ -423,7 +333,7 @@ function Contact() {
         </Reveal>
         <div className="mt-16 flex flex-wrap gap-3">
           <PillLink href={RESUME}>
-            <FilePdf size={18} /> Resume
+            <FilePdf size={18} /> {COPY.contact.resume}
           </PillLink>
           <PillLink href={LINKEDIN}>
             <LinkedinLogo size={18} /> LinkedIn
@@ -434,9 +344,9 @@ function Contact() {
         </div>
       </div>
       <footer className="mx-auto flex w-full max-w-7xl flex-wrap justify-between gap-4 border-t border-line px-5 py-8 text-sm text-mute md:px-8">
-        <span>© 2026 Bao Ly</span>
+        <span>{COPY.footer.owner}</span>
         <span className="hidden md:block">
-          Press <kbd className="font-mono text-fog">j</kbd> / <kbd className="font-mono text-fog">k</kbd> to move between sections
+          {COPY.footer.keysBefore} <kbd className="font-mono text-fog">j</kbd> / <kbd className="font-mono text-fog">k</kbd> {COPY.footer.keysAfter}
         </span>
       </footer>
     </section>
@@ -466,7 +376,7 @@ export default function App() {
         <Nav />
         <main className="relative">
           <Hero />
-          {PROJECTS.map((project) => (
+          {COPY.projects.map((project) => (
             <ProjectSection key={project.id} project={project} />
           ))}
           <Experience />

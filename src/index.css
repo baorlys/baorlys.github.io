@@ -245,4 +245,41 @@ main > section {
   .case td:first-child {
     color: var(--color-fog);
   }
+
+  .case .d-box .d-chip {
+    fill: color-mix(in oklab, var(--color-acid) 18%, var(--color-ink));
+    stroke: var(--color-acid);
+    stroke-width: 1;
+  }
+
+  .case .d-box .d-row {
+    fill: var(--color-ink-2);
+    stroke: var(--color-line);
+    stroke-width: 1;
+  }
+
+  .case .d-box .d-left {
+    text-anchor: start;
+    fill: var(--color-fog);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .case .d-dot-free {
+    fill: var(--color-acid);
+  }
+
+  .case .d-dot-held {
+    fill: #ffcf4a;
+  }
+
+  .case .d-dot-used {
+    fill: #5b615a;
+  }
+
+  .case .d-box .d-legend text {
+    fill: var(--color-mute);
+    font-size: 11px;
+    text-anchor: start;
+  }
 }

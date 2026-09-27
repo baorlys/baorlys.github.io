@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0c0d0c" />
+    <title>Cấp 11.000 mã khách hàng mỗi ngày mà không trùng cái nào - Lý Gia Bảo</title>
+    <meta name="description" content="Trong luồng onboarding của một ngân hàng số, mình bỏ cách cấp mã khách hàng theo sequence và chuyển sang các pool cấp sẵn." />
+    <link rel="canonical" href="https://baorlys.dev/vi/work/cif-allocation/" />
+    <link rel="alternate" hreflang="en" href="https://baorlys.dev/work/cif-allocation/" />
+    <link rel="alternate" hreflang="vi" href="https://baorlys.dev/vi/work/cif-allocation/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:url" content="https://baorlys.dev/vi/work/cif-allocation/" />
+    <meta property="og:title" content="Cấp 11.000 mã khách hàng mỗi ngày mà không trùng cái nào" />
+    <meta property="og:description" content="Trong luồng onboarding của một ngân hàng số, mình bỏ cách cấp mã khách hàng theo sequence và chuyển sang các pool cấp sẵn." />
+    <meta property="og:image" content="https://baorlys.dev/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="module" src="/src/case.ts"></script>
+  </head>
+  <body class="grain">
+    <header class="border-b border-line/60">
+      <nav class="mx-auto flex h-16 max-w-3xl items-center justify-between px-5 md:px-8">
+        <a href="/vi/" class="font-mono text-sm font-semibold tracking-tight">bao<span class="text-acid">.</span>ly</a>
+        <div class="flex items-center gap-5">
+          <a href="/work/cif-allocation/" hreflang="en" lang="en" aria-label="English" class="font-mono text-xs font-semibold tracking-wider text-mute transition hover:text-acid">EN</a>
+          <a href="/vi/#bank" class="text-sm text-mute transition hover:text-fog">Về trang dự án</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+      <article class="case">
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-acid">Case study, ngân hàng số</p>
+        <h1 class="mt-5 text-4xl font-semibold leading-[1.12] tracking-tighter md:text-6xl">Cấp 11.000 mã khách hàng mỗi ngày mà không trùng cái nào</h1>
+        <p class="mt-6 text-lg leading-relaxed text-mute">Trong luồng onboarding của một ngân hàng số, mình bỏ cách cấp mã khách hàng theo sequence và chuyển sang các pool cấp sẵn. Chuyện đằng sau là thế này.</p>
+
+        <h2>Bài toán</h2>
+        <p>Ai mở tài khoản ở ngân hàng cũng được cấp một số CIF, cái mã đi theo họ qua mọi sản phẩm. Ngân hàng có khoảng 3 triệu khách, và mỗi ngày luồng onboarding cấp chừng 11.000 số như vậy. Thiết kế cũ lấy số từ một sequence: không trùng thật, nhưng nhìn số trước là đoán được số sau.</p>
+
+        <h2>Mã phải làm được gì</h2>
+        <ul>
+          <li>Không bao giờ trùng. Trùng CIF là hai người xài chung một danh tính ngân hàng, nghe thôi đã thấy toang.</li>
+          <li>Không để lộ số liền trước hay liền sau.</li>
+          <li>Mỗi loại khách một định dạng riêng, có prefix và độ dài riêng.</li>
+          <li>Nhiều pod cùng cấp một lúc mà không phải chờ nhau.</li>
+        </ul>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 800 440" role="img" aria-labelledby="cif-vi-1-t cif-vi-1-d"><title id="cif-vi-1-t">Các pool CIF ráp với nhau thế nào</title><desc id="cif-vi-1-d">Các pod onboarding lấy mã từ pool của từng loại khách trong PostgreSQL bằng SKIP LOCKED. Cron nạp thêm mã sinh bằng Feistel theo từng lô có giới hạn, job thu hồi trả lại mã pod chết bỏ dở, gauge độ sâu pool bắn alert.</desc><defs><marker id="cif-vi-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="d-head" /></marker></defs><g class="d-box"><rect x="20" y="70" width="150" height="60" rx="12" /><text x="95.0" y="95">Onboarding</text><text x="95.0" y="115" class="d-sub">khách mới</text></g><g class="d-box"><rect x="200" y="40" width="140" height="120" rx="12" /><text x="270" y="70" class="d-strong">Pod onboarding</text><rect x="217" y="94" width="30" height="42" rx="6" class="d-chip" /><rect x="255" y="94" width="30" height="42" rx="6" class="d-chip" /><rect x="293" y="94" width="30" height="42" rx="6" class="d-chip" /></g><g class="d-box d-main"><rect x="440" y="30" width="210" height="256" rx="14" /><text x="545" y="62" class="d-strong">Pool CIF</text><rect x="458" y="80" width="174" height="42" rx="8" class="d-row" /><text x="474" y="106" class="d-left">loại A</text><circle cx="562" cy="101" r="5" class="d-dot-free" /><circle cx="578" cy="101" r="5" class="d-dot-free" /><circle cx="594" cy="101" r="5" class="d-dot-held" /><circle cx="610" cy="101" r="5" class="d-dot-used" /><rect x="458" y="134" width="174" height="42" rx="8" class="d-row" /><text x="474" y="160" class="d-left">loại B</text><circle cx="562" cy="155" r="5" class="d-dot-free" /><circle cx="578" cy="155" r="5" class="d-dot-free" /><circle cx="594" cy="155" r="5" class="d-dot-held" /><circle cx="610" cy="155" r="5" class="d-dot-used" /><rect x="458" y="188" width="174" height="42" rx="8" class="d-row" /><text x="474" y="214" class="d-left">loại C</text><circle cx="562" cy="209" r="5" class="d-dot-free" /><circle cx="578" cy="209" r="5" class="d-dot-free" /><circle cx="594" cy="209" r="5" class="d-dot-held" /><circle cx="610" cy="209" r="5" class="d-dot-used" /><g class="d-legend"><circle cx="460" cy="264" r="4.5" class="d-dot-free" /><text x="469" y="268">trống</text><circle cx="508" cy="264" r="4.5" class="d-dot-held" /><text x="517" y="268">đang giữ</text><circle cx="573" cy="264" r="4.5" class="d-dot-used" /><text x="582" y="268">đã dùng</text></g></g><g class="d-box"><rect x="680" y="76" width="110" height="64" rx="12" /><text x="735.0" y="103">Alert</text><text x="735.0" y="123" class="d-sub">pool sắp cạn</text></g><g class="d-box"><rect x="20" y="340" width="150" height="70" rx="12" /><text x="95.0" y="370" class="d-strong">Feistel</text><text x="95.0" y="390" class="d-sub">seed · prefix · độ dài</text></g><g class="d-box"><rect x="200" y="340" width="150" height="70" rx="12" /><text x="275.0" y="370" class="d-strong">Cron nạp</text><text x="275.0" y="390" class="d-sub">theo lô có giới hạn</text></g><g class="d-box"><rect x="640" y="340" width="150" height="70" rx="12" /><text x="715.0" y="370" class="d-strong">Job thu hồi</text><text x="715.0" y="390" class="d-sub">mã bị bỏ dở</text></g><g class="d-line"><path d="M170 100 H196" marker-end="url(#cif-vi-1)" /><path d="M340 100 H436" marker-end="url(#cif-vi-1)" /><path d="M170 375 H196" marker-end="url(#cif-vi-1)" /><path d="M350 375 C 420 375, 470 350, 490 290" marker-end="url(#cif-vi-1)" /><path d="M715 340 C 710 318, 660 300, 630 290" marker-end="url(#cif-vi-1)" /><path d="M650 108 H676" marker-end="url(#cif-vi-1)" /></g><g class="d-step"><circle cx="388" cy="100" r="11" /><text x="388" y="104">1</text><circle cx="438" cy="352" r="11" /><text x="438" y="356">2</text><circle cx="692" cy="312" r="11" /><text x="692" y="316">3</text></g><text x="388" y="128" class="d-label">lấy mã</text><text x="388" y="144" class="d-label">SKIP LOCKED</text></svg>
+          <figcaption>1. Pod lấy một mã trống mà không phải chờ pod khác. 2. Cron nạp thêm khi pool xuống dưới ngưỡng. 3. Job thu hồi trả lại mã mà pod chết đã giữ nhưng chưa kịp dùng.</figcaption>
+        </figure>
+
+        <h2>Mỗi loại khách một pool</h2>
+        <p>Mỗi loại khách có pool riêng, mỗi pool giữ Feistel seed, prefix và độ dài mã của riêng nó.</p>
+
+        <h2>Sao lại là Feistel</h2>
+        <p>Mạng Feistel biến một bộ đếm thành một con số đã xáo trộn, cùng kích thước. Nó là một hoán vị nên hai đầu vào khác nhau không bao giờ ra cùng một kết quả, và mã tự khắc không trùng mà khỏi cần dò bảng nào. Cấp một mã tốn thời gian cố định, không phải sinh trước, cũng chẳng phải hỏi database xem mã đã có ai dùng chưa.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 800 250" role="img" aria-labelledby="cif-vi-2-t cif-vi-2-d"><title id="cif-vi-2-t">Một mã CIF ra đời thế nào</title><desc id="cif-vi-2-d">Bộ đếm đi qua các vòng Feistel của pool. Ra ngoài khoảng mã thì đi thêm vòng nữa, rồi ghép prefix và độ dài cố định.</desc><defs><marker id="cif-vi-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="d-head" /></marker></defs><g class="d-box"><rect x="20" y="80" width="130" height="76" rx="12" /><text x="85.0" y="113" class="d-strong">Bộ đếm</text><text x="85.0" y="133" class="d-sub">số n kế tiếp</text></g><g class="d-box d-main"><rect x="180" y="80" width="130" height="76" rx="12" /><text x="245.0" y="113" class="d-strong">Vòng Feistel</text><text x="245.0" y="133" class="d-sub">khoá bằng seed</text></g><g class="d-box"><rect x="340" y="80" width="130" height="76" rx="12" /><text x="405.0" y="113" class="d-strong">Trong khoảng?</text><text x="405.0" y="133" class="d-sub">không thì đi tiếp</text></g><g class="d-box"><rect x="500" y="80" width="130" height="76" rx="12" /><text x="565.0" y="113" class="d-strong">Định dạng</text><text x="565.0" y="133" class="d-sub">prefix + độ dài</text></g><g class="d-box"><rect x="660" y="80" width="130" height="76" rx="12" /><text x="725.0" y="113" class="d-strong">CIF</text><text x="725.0" y="133" class="d-sub">không trùng</text></g><g class="d-line"><path d="M150 118 H176" marker-end="url(#cif-vi-2)" /><path d="M310 118 H336" marker-end="url(#cif-vi-2)" /><path d="M470 118 H496" marker-end="url(#cif-vi-2)" /><path d="M630 118 H656" marker-end="url(#cif-vi-2)" /><path d="M405 80 C 405 30, 245 30, 245 76" marker-end="url(#cif-vi-2)" /></g><text x="325" y="36" class="d-label">cycle-walk</text><text x="400" y="200" class="d-label">Cùng đầu vào luôn ra cùng kết quả, và hai đầu vào không bao giờ đụng nhau.</text></svg>
+          <figcaption>Không trùng là nhờ hoán vị, nên chẳng cần dò bảng nào.</figcaption>
+        </figure>
+        <pre><code>// Simplified sketch, not the production code.
+long permute(long counter, long domain, long[] roundKeys) {
+    long x = counter;
+    do {
+        x = feistel(x, roundKeys);
+    } while (x &gt;= domain); // cycle-walk until the result fits the ID length
+    return x;
+}</code></pre>
+
+        <h2>Lấy mã không cần xếp hàng</h2>
+        <p>Các pod lấy mã bằng <code>FOR UPDATE SKIP LOCKED</code> của PostgreSQL. Pod này đang khoá một dòng thì pod kia bỏ qua và lấy dòng khác, nên các request onboarding chạy song song không phải đứng đợi nhau.</p>
+        <pre><code>-- Simplified sketch.
+SELECT id FROM cif_pool
+WHERE customer_type = :type AND status = 'AVAILABLE'
+ORDER BY id
+LIMIT 1
+FOR UPDATE SKIP LOCKED;</code></pre>
+
+        <h2>Giữ cho pool luôn đầy</h2>
+        <p>Một cron job nạp thêm khi pool xuống dưới ngưỡng tối thiểu. Mỗi lần chạy bị giới hạn bởi <code>max-batches-per-run</code>, nên pool có cạn cũng không dội một cục insert vào database. Còn có một job thu hồi, nhặt lại những mã đã giữ chỗ mà pod lăn ra chết trước khi kịp dùng.</p>
+
+        <h2>Theo dõi</h2>
+        <p>Micrometer gauge báo độ sâu của từng pool, pool sắp cạn là có alert trước.</p>
+
+        <h2>Chỉnh bảng nóng</h2>
+        <p>Bảng cấp mã là bảng bận nhất trong luồng. Mình cấu trúc lại để giảm write amplification, và bỏ luôn một index chống trùng đã thành nút thắt throughput.</p>
+
+        <h2>Kết quả</h2>
+        <p>Các pool cấp khoảng 11.000 CIF mỗi ngày, chưa trùng lần nào.</p>
+
+        <ul class="chips">
+          <li>Java</li>
+          <li>Spring Boot</li>
+          <li>PostgreSQL</li>
+          <li>Micrometer</li>
+          <li>Kubernetes</li>
+        </ul>
+
+        <p class="note">Chi tiết đã được đơn giản hoá và không nêu tên khách hàng.</p>
+      </article>
+
+      <nav class="mt-16 flex flex-wrap gap-3 border-t border-line pt-10">
+        <a href="/vi/#bank" class="inline-flex items-center gap-2 rounded-full bg-acid px-5 py-3 text-sm font-medium text-ink transition hover:bg-fog">Về trang dự án</a>
+        <a href="mailto:lygiabaokg2002@gmail.com" class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-medium transition hover:border-fog/60">Gửi mail cho mình</a>
+      </nav>
+    </main>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ac1531c9c50444fb83a46822716e9cf"}'></script>
+  </body>
+</html>

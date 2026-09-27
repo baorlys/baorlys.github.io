@@ -3,7 +3,9 @@ import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef, type ReactNode } from 'react'
 import { Color, ExtrudeGeometry, Group, InstancedMesh, Object3D } from 'three'
 import { createCoinGeometry, heartShape, INK, Model, MODELS, Outline, starShape, Toon, toon, useCanvasTexture, useTilt } from './Props'
+import { LANG } from './copy'
 
+const VI = LANG === 'vi'
 const ACID = '#b8f36a'
 const FOG = '#e8eae5'
 const GOLD = '#ffcf4a'
@@ -104,14 +106,14 @@ const GLYPHS: Record<string, Glyph> = {
 }
 
 const APPS = [
-  { name: 'Food', color: '#ffb86b', glyph: 'food' },
-  { name: 'Ride', color: '#ffd84d', glyph: 'ride' },
-  { name: 'Coffee', color: '#d9a878', glyph: 'coffee' },
-  { name: 'Health', color: '#ff7a85', glyph: 'health' },
-  { name: 'Shop', color: '#7ad7f0', glyph: 'shop' },
-  { name: 'Bills', color: '#a38bff', glyph: 'bills' },
-  { name: 'Movies', color: '#ff9ed1', glyph: 'movies' },
-  { name: 'Rewards', color: ACID, glyph: 'rewards' },
+  { name: VI ? 'Đồ ăn' : 'Food', color: '#ffb86b', glyph: 'food' },
+  { name: VI ? 'Đi xe' : 'Ride', color: '#ffd84d', glyph: 'ride' },
+  { name: VI ? 'Cà phê' : 'Coffee', color: '#d9a878', glyph: 'coffee' },
+  { name: VI ? 'Sức khoẻ' : 'Health', color: '#ff7a85', glyph: 'health' },
+  { name: VI ? 'Mua sắm' : 'Shop', color: '#7ad7f0', glyph: 'shop' },
+  { name: VI ? 'Hoá đơn' : 'Bills', color: '#a38bff', glyph: 'bills' },
+  { name: VI ? 'Xem phim' : 'Movies', color: '#ff9ed1', glyph: 'movies' },
+  { name: VI ? 'Ưu đãi' : 'Rewards', color: ACID, glyph: 'rewards' },
 ]
 
 const SCREEN_W = 600
@@ -138,10 +140,10 @@ function drawAppScreen(ctx: CanvasRenderingContext2D) {
 
   ctx.fillStyle = '#9aa097'
   ctx.font = '500 30px "Geist Variable", sans-serif'
-  ctx.fillText('Good morning', 56, 178)
+  ctx.fillText(VI ? 'Chào buổi sáng' : 'Good morning', 56, 178)
   ctx.fillStyle = FOG
   ctx.font = '700 58px "Geist Variable", sans-serif'
-  ctx.fillText('Bao Ly', 56, 242)
+  ctx.fillText(VI ? 'Gia Bảo' : 'Bao Ly', 56, 242)
   ctx.fillStyle = ACID
   ctx.beginPath()
   ctx.arc(510, 206, 40, 0, Math.PI * 2)
@@ -160,10 +162,10 @@ function drawAppScreen(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = 'left'
   ctx.fillStyle = INK
   ctx.font = '500 26px "Geist Variable", sans-serif'
-  ctx.fillText('Wallet balance', 78, 348)
+  ctx.fillText(VI ? 'Số dư ví' : 'Wallet balance', 78, 348)
   ctx.font = '700 52px "Geist Variable", sans-serif'
-  ctx.fillText('12,480,000 ₫', 78, 420)
-  ;['Top up', 'Transfer', 'Pay'].forEach((label, i) => {
+  ctx.fillText(VI ? '12.480.000 ₫' : '12,480,000 ₫', 78, 420)
+  ;(VI ? ['Nạp tiền', 'Chuyển', 'Thanh toán'] : ['Top up', 'Transfer', 'Pay']).forEach((label, i) => {
     roundRect(ctx, 78 + i * 150, 452, 136, 48, 24, INK)
     ctx.fillStyle = ACID
     ctx.font = '600 22px "Geist Variable", sans-serif'
@@ -174,11 +176,11 @@ function drawAppScreen(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = 'left'
   ctx.fillStyle = FOG
   ctx.font = '600 34px "Geist Variable", sans-serif'
-  ctx.fillText('Mini-apps', 56, 600)
+  ctx.fillText(VI ? 'Mini-app' : 'Mini-apps', 56, 600)
   ctx.fillStyle = '#9aa097'
   ctx.font = '500 24px "Geist Variable", sans-serif'
   ctx.textAlign = 'right'
-  ctx.fillText('See all', 544, 600)
+  ctx.fillText(VI ? 'Xem hết' : 'See all', 544, 600)
 
   ctx.textAlign = 'center'
   APPS.forEach((app, i) => {
@@ -204,10 +206,10 @@ function drawAppScreen(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = 'left'
   ctx.fillStyle = FOG
   ctx.font = '700 30px "Geist Variable", sans-serif'
-  ctx.fillText('Earn 2x points', 164, 1066)
+  ctx.fillText(VI ? 'Nhân đôi điểm' : 'Earn 2x points', 164, 1066)
   ctx.fillStyle = '#9aa097'
   ctx.font = '500 22px "Geist Variable", sans-serif'
-  ctx.fillText('at partner cafes this week', 164, 1104)
+  ctx.fillText(VI ? 'ở quán cà phê đối tác tuần này' : 'at partner cafes this week', 164, 1104)
 
   ;[0, 1, 2, 3].forEach((i) => {
     ctx.fillStyle = i === 0 ? ACID : '#3d423c'
