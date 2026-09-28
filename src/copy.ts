@@ -31,10 +31,10 @@ type Copy = {
     title: [string, string, string]
     body: string
     skills: string
-    cacheTitle: string
-    cacheBody: string
-    docTitle: string
-    docBody: string
+    measureTitle: string
+    measureBody: string
+    splitTitle: string
+    splitBody: string
     stack: string
   }
   contact: { title: string; resume: string }
@@ -131,13 +131,13 @@ const EN: Copy = {
     },
   ],
   approach: {
-    title: ['Banking code gets one chance to be ', 'right', '.'],
-    body: 'Money and identity flows get idempotency, clear error codes and tests on real config before any tuning.',
-    skills: 'skills in the team’s Claude Code plugin I wrote, turning our conventions into checks that run on every change.',
-    cacheTitle: 'Profile, then cache',
-    cacheBody: 'The challenge chain got a cache only after profiling showed three queries per start and five per switch.',
-    docTitle: 'Write it down',
-    docBody: 'A design doc for every cross-service decision, so the next engineer does not have to guess.',
+    title: ['See the whole problem before the ', 'first line', '.'],
+    body: 'I work top down: map the flow end to end, find where it can break, then solve one piece at a time. Money and identity flows still get idempotency, clear error codes and tests on real config.',
+    skills: 'skills in the Claude Code plugin I wrote for the team. AI takes the first pass on every task, and our conventions run as checks on every change.',
+    measureTitle: 'Measure first',
+    measureBody: 'The challenge chain got a cache only after profiling showed three queries per start and five per switch.',
+    splitTitle: 'Break it down',
+    splitBody: 'CIF allocation became four smaller problems: per-type pools, Feistel IDs, SKIP LOCKED claims and capped refills. Each is small enough to reason about and test alone.',
     stack: 'Tech stack',
   },
   contact: { title: 'Building something that has to hold?', resume: 'Resume' },
@@ -230,13 +230,13 @@ const VI: Copy = {
     },
   ],
   approach: {
-    title: ['Code ngân hàng chỉ có một cơ hội để ', 'đúng', '.'],
-    body: 'Luồng tiền và danh tính phải có idempotency, mã lỗi rõ ràng và test trên config thật, xong xuôi rồi mới tính chuyện tối ưu.',
-    skills: 'skill trong plugin Claude Code mình viết cho team, biến quy ước của team thành bước kiểm tra tự chạy mỗi lần sửa code.',
-    cacheTitle: 'Đo trước, cache sau',
-    cacheBody: 'Challenge chain chỉ được thêm cache sau khi profiling thấy mỗi lần start tốn ba query, mỗi lần switch tốn năm.',
-    docTitle: 'Viết ra giấy',
-    docBody: 'Quyết định nào dính tới nhiều service đều có design doc, để người đến sau khỏi phải đoán mò.',
+    title: ['Nhìn hết bài toán rồi mới viết ', 'dòng đầu tiên', '.'],
+    body: 'Mình đi từ trên xuống: vẽ cả luồng từ đầu tới cuối, tìm chỗ có thể hỏng, rồi giải từng phần một. Luồng tiền và danh tính vẫn phải có idempotency, mã lỗi rõ ràng và test trên config thật.',
+    skills: 'skill trong plugin Claude Code mình viết cho team. Việc nào AI cũng làm lượt đầu, còn quy ước của team thành bước kiểm tra tự chạy mỗi lần sửa code.',
+    measureTitle: 'Đo trước, sửa sau',
+    measureBody: 'Challenge chain chỉ được thêm cache sau khi profiling thấy mỗi lần start tốn ba query, mỗi lần switch tốn năm.',
+    splitTitle: 'Chia nhỏ bài toán',
+    splitBody: 'Cấp số CIF được tách thành bốn bài nhỏ: pool theo loại khách, sinh số bằng Feistel, lấy số bằng SKIP LOCKED, nạp lại có giới hạn. Bài nào cũng đủ nhỏ để nghĩ cho thấu và test riêng.',
     stack: 'Công nghệ',
   },
   contact: { title: 'Đang xây thứ gì đó không được phép sập?', resume: 'CV' },

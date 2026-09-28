@@ -300,12 +300,12 @@ function Approach() {
             </p>
           </Reveal>
           <Reveal delay={0.1} className={`${cell} bg-ink md:col-span-2`}>
-            <h3 className="text-xl font-medium">{COPY.approach.cacheTitle}</h3>
-            <p className="mt-3 leading-relaxed text-mute">{COPY.approach.cacheBody}</p>
+            <h3 className="text-xl font-medium">{COPY.approach.measureTitle}</h3>
+            <p className="mt-3 leading-relaxed text-mute">{COPY.approach.measureBody}</p>
           </Reveal>
           <Reveal delay={0.14} className={`${cell} bg-ink md:col-span-2`}>
-            <h3 className="text-xl font-medium">{COPY.approach.docTitle}</h3>
-            <p className="mt-3 leading-relaxed text-mute">{COPY.approach.docBody}</p>
+            <h3 className="text-xl font-medium">{COPY.approach.splitTitle}</h3>
+            <p className="mt-3 leading-relaxed text-mute">{COPY.approach.splitBody}</p>
           </Reveal>
           <Reveal delay={0.18} className={`${cell} bg-ink md:col-span-2`}>
             <h3 className="sr-only">{COPY.approach.stack}</h3>
